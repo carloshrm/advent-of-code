@@ -46,23 +46,29 @@ public:
 		double third{ 0.0 };
 
 		double current_elf{ 0.0 };
+
 		for (std::string_view calorie_value : lines)
 		{
 			if (calorie_value.empty())
 			{
 				if (current_elf > first)
 				{
+					if (second != 0)
+					{
+						third = second;
+						second = first;
+					}
 					first = current_elf;
-					second = first;
-					third = second;
 				}
 				else if (current_elf > second)
 				{
+					if (third != 0)
+						third = second;
 					second = current_elf;
-					third = second;
 				}
 				else if (current_elf > third)
 					third = current_elf;
+
 				current_elf = 0.0;
 			}
 			else
