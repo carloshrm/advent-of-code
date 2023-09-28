@@ -8,8 +8,6 @@ class Day2
 {
 	std::vector<std::string> lines{ };
 
-
-
 public:
 	Day2()
 	{
