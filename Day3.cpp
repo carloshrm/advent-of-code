@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <stack>
 
 class Day3
 {
@@ -35,7 +36,7 @@ public:
 				char current_item{ ln[len + i] };
 				if (stuff.contains(current_item))
 				{
-					priority_sum += (current_item > 96) ? (current_item - 96) : (current_item - 38);
+					priority_sum += parsePriority(current_item);
 					break;
 				}
 			}		
@@ -46,7 +47,28 @@ public:
 
 	double partTwo()
 	{
-		return 0;
+		int badge_priority{ 0 };
+		for (size_t i = 0; i < lines.size(); i += 3)
+		{
+			std::vector<std::string_view> group{ lines[i], lines[i + 1], lines[i + 2] };
+			badge_priority += findBadge(group);
+		}
+		return badge_priority;
 	}
 
+private:
+	int parsePriority(char letter)
+	{
+		return (letter > 96) ? (letter - 96) : (letter - 38);
+	}
+
+	int findBadge(std::vector<std::string_view> &group)
+	{
+		for (char c : group[0])
+		{
+			if (group[1].find(c) != std::string::npos && group[2].find(c) != std::string::npos)
+				return parsePriority(c);
+		}
+		return 0;
+	}
 };
