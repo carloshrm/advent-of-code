@@ -69,6 +69,31 @@ public:
 
 	double partTwo()
 	{
-		return 0;
+		int overlap{ 0 };
+		for (std::string_view section : lines)
+		{
+			size_t division = section.find(",");
+			std::string_view const first_part{ section.substr(0, division) };
+			std::string_view const secnd_part{ section.substr(division + 1, section.size() - division) };
+			auto first_range = parseRange(first_part);
+			auto second_range = parseRange(secnd_part);
+
+			if (first_range.first == second_range.first)
+				overlap++;
+			else
+			{
+				if (first_range.first > second_range.first)
+				{
+					if (second_range.second >= first_range.first)
+						overlap++;
+				}
+				else
+				{
+					if (second_range.first <= first_range.second)
+						overlap++;
+				}
+			}
+		}
+		return overlap;
 	}
 };
