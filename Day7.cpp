@@ -19,7 +19,7 @@ private:
 			parent = p;
 		}
 
-		std::vector<int> files{ };
+		int content_size{ 0 };
 		std::map<std::string, Day7::ElfFolder *> folders{ };
 		ElfFolder *parent;
 	};
@@ -27,13 +27,25 @@ private:
 	ElfFolder *root = nullptr;
 	ElfFolder *current_folder = nullptr;
 
+	int findLargest(Day7::ElfFolder *f, int limit)
+	{
+		int internal_sum{ 0 };
+		if (f->content_size < limit)
+			internal_sum += f->content_size;
+
+		for (auto &[k, v] : f->folders)
+			internal_sum += findLargest(v, limit);
+
+		return internal_sum;
+	}
+
 public:
 	Day7()
 	{
 		root = new ElfFolder();
 		current_folder = root;
 		std::string line{ };
-		std::ifstream input("day7e.txt");
+		std::ifstream input("day7.txt");
 		while (std::getline(input, line))
 		{
 			if (line[0] == '$')
@@ -42,7 +54,10 @@ public:
 				if (pos != std::string::npos)
 				{
 					if (line.find("..") != std::string::npos)
+					{
+						current_folder->parent->content_size += current_folder->content_size;
 						current_folder = current_folder->parent;
+					}
 					else
 					{
 						if (line.find("/") != std::string::npos)
@@ -58,7 +73,7 @@ public:
 				if (dir == std::string::npos)
 				{
 					int size{ std::stoi(line) };
-					current_folder->files.push_back(size);
+					current_folder->content_size += size;
 				}
 				else
 				{
@@ -72,9 +87,12 @@ public:
 
 	int partOne()
 	{
-
-		return -1;
+		int size_limit{ 100000 };
+		int sum{ findLargest(root, size_limit) };
+		return sum;
 	}
+
+
 
 	int partTwo()
 	{
