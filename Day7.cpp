@@ -27,7 +27,7 @@ private:
 	ElfFolder *root = nullptr;
 	ElfFolder *current_folder = nullptr;
 
-	int findLargest(Day7::ElfFolder *f, int limit)
+	int findLargest(ElfFolder *f, int limit)
 	{
 		int internal_sum{ 0 };
 		if (f->content_size < limit)
@@ -37,6 +37,22 @@ private:
 			internal_sum += findLargest(v, limit);
 
 		return internal_sum;
+	}
+
+	int findSmallestWithinLimits(ElfFolder *f, int free_space)
+	{
+		int dir_size{ f->content_size };
+		for (auto &[k, v] : f->folders)
+		{
+			int size_check{ findSmallestWithinLimits(v, free_space) };
+			if (size_check < dir_size && size_check != 0)
+				dir_size = size_check;
+		}
+
+		if (free_space + dir_size >= 30000000)
+			return dir_size;
+		else
+			return 0;
 	}
 
 public:
@@ -83,21 +99,23 @@ public:
 
 			}
 		}
+		while (current_folder != root)
+		{
+			current_folder->parent->content_size += current_folder->content_size;
+			current_folder = current_folder->parent;
+		}
 	}
 
 	int partOne()
 	{
-		int size_limit{ 100000 };
-		int sum{ findLargest(root, size_limit) };
-		return sum;
+		return findLargest(root, 100000);
 	}
 
 
 
 	int partTwo()
 	{
-
-		return -1;
+		return findSmallestWithinLimits(root, 70000000 - root->content_size);
 	}
 
 };
