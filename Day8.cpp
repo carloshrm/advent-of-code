@@ -50,7 +50,7 @@ private:
 		{
 			if (map[(row * n_rows) + j] >= target_height)
 				return false;
-		} 
+		}
 		return true;
 	}
 
@@ -104,7 +104,58 @@ public:
 
 	int partTwo()
 	{
+		int max_vis_score{ 0 };
+		for (size_t i = 1; i < n_rows - 1; i++)
+		{
+			for (size_t j = 1; j < n_cols - 1; j++)
+			{
+				int current_tree{ map[(i * n_rows) + j] };
 
-		return -1;
+				int left{ (int)j - 1 };
+				while (left > 0)
+				{
+					if (map[(i * n_rows) + left] >= current_tree || left == 0)
+						break;
+					else
+						left--;
+				}
+				left = abs(left - (int)j);
+
+				int right{ (int)j + 1 };
+				while (right < n_cols - 1)
+				{
+					if (map[(i * n_rows) + right] >= current_tree)
+						break;
+					else
+						right++;
+				}
+				right = abs(right - (int)j);
+
+				int down{ (int)i + 1 };
+				while (down < n_rows - 1)
+				{
+					if (map[(down * n_rows) + j] >= current_tree)
+						break;
+					else
+						down++;
+				}
+				down = abs(down - (int)i);
+
+				int up{ (int)i - 1 };
+				while (up > 0)
+				{
+					if (map[(up * n_rows) + j] >= current_tree)
+						break;
+					else
+						up--;
+				}
+				up = abs(up - (int)i);
+
+				int current_vis_score{ (int)(left * right * up * down) };
+				if (current_vis_score > max_vis_score)
+					max_vis_score = current_vis_score;
+			}
+		}
+		return max_vis_score;
 	}
 };
