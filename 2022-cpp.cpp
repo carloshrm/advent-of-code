@@ -1,12 +1,12 @@
 
-#include "day7.cpp"
+#include "day8.cpp"
 #include <iostream>
 #include <fstream>
 #include <string>
 
 int main()
 {
-	Day7 solution{};
+	Day8 solution{};
 	std::cout << solution.partTwo() << " || " << solution.partOne();
 	return 0;
 }
