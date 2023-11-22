@@ -7,6 +7,6 @@
 int main()
 {
 	Day9 solution{};
-	std::cout << solution.partTwo() << " || " << solution.partOne();
+	std::cout << solution.partTwo();
 	return 0;
 }
