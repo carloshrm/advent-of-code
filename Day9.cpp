@@ -6,9 +6,6 @@
 #include <fstream>
 #include <iostream>
 #include <Windows.h>
-#include <stdlib.h>
-#include <thread>         // std::this_thread::sleep_for
-#include <chrono>         // std::chrono::seconds
 
 const std::map<char, std::pair<int, int>> dir_offset{
 	{'D', {	 0,  1}},
@@ -107,6 +104,7 @@ public:
 		{
 			head = new Knot(0, 0);
 			head->next = new Knot(0, 0);
+			tail = head->next;
 		}
 
 		Rope(int tail_count)

@@ -3,6 +3,8 @@
 #include <vector>
 #include <map>
 #include <charconv>
+#include <iostream>
+#include <Windows.h>
 
 class Day10
 {
@@ -32,17 +34,17 @@ public:
 			{
 				int val;
 				auto [has_val, _] = std::from_chars(line.data() + op + 1, line.data() + line.size(), val);
-				sig_str += monitor.pulse();
-				monitor.addx(val);
-				sig_str += monitor.pulse();
+				sig_str += monitor.pulse(val);
 			}
 		}
 		return sig_str;
 	}
 
-	// crt
-	// clockPulse, setter ++
-	// check str
+	double partTwo()
+	{
+		return partOne();
+	}
+
 	class CRT
 	{
 	private:
@@ -58,14 +60,36 @@ public:
 			x = 1;
 		}
 
+		void draw()
+		{
+			char current_pixel = '.';
+			int clock_val = (clock - 1) % 40;
+			for (int i = -1; i <= 1; i++)
+			{
+				int sprite = x + i;
+				if (clock_val == sprite)
+					current_pixel = '#';
+			}
+			COORD c{ clock_val, ((int)clock / 40) };
+			SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+			std::cout << current_pixel;
+		}
+
 		void addx(int val)
 		{
 			x += val;
 		}
 
-		int pulse()
+		int pulse(int v = 0)
 		{
+			draw();
 			clock++;
+			if (v != 0)
+			{
+				int inner = pulse();
+				addx(v);
+				return inner;
+			}
 			return checkSignalStrength();
 		}
 
@@ -80,8 +104,4 @@ public:
 				return 0;
 		}
 	};
-	double partTwo()
-	{
-		return -1;
-	}
 };
