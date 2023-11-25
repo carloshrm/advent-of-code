@@ -14,7 +14,7 @@ public:
 	Day10()
 	{
 		std::string line{ };
-		std::ifstream input("day10.txt");
+		std::ifstream input("day10e.txt");
 		while (std::getline(input, line))
 			lines.push_back(line);
 	}
@@ -28,13 +28,14 @@ public:
 			auto op = line.find(" ");
 			if (op == std::string::npos)
 			{
-				sig_str += monitor.pulse();
+				sig_str += monitor.cycle();
 			}
 			else
 			{
 				int val;
 				auto [has_val, _] = std::from_chars(line.data() + op + 1, line.data() + line.size(), val);
-				sig_str += monitor.pulse(val);
+				sig_str += monitor.cycle();
+				sig_str += monitor.cycle(val);
 			}
 		}
 		return sig_str;
@@ -80,16 +81,12 @@ public:
 			x += val;
 		}
 
-		int pulse(int v = 0)
+		int cycle(int val = 0)
 		{
 			draw();
+			if (val != 0)
+				addx(val);
 			clock++;
-			if (v != 0)
-			{
-				int inner = pulse();
-				addx(v);
-				return inner;
-			}
 			return checkSignalStrength();
 		}
 
