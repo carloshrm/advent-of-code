@@ -18,10 +18,7 @@
     <ClCompile Include="2022-cpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Day9.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Day10.cpp">
+    <ClCompile Include="Day11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

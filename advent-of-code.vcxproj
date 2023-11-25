@@ -131,8 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="2022-cpp.cpp" />
-    <ClCompile Include="Day10.cpp" />
-    <ClCompile Include="Day9.cpp" />
+    <ClCompile Include="Day11.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
