@@ -45,15 +45,12 @@ int check_string_p2(char *current_string)
     {
         if (i + 1 < len && !has_pair)
         {
-            for (size_t j = i + 2; j < len; j++)
+            for (size_t j = i + 2; j + 1 < len; j++)
             {
-                if (j + 1 < len)
+                if (current_string[i] == current_string[j] && current_string[i + 1] == current_string[j + 1])
                 {
-                    if (current_string[i] == current_string[j] && current_string[i + 1] == current_string[j + 1])
-                    {
-                        has_pair = 1;
-                        break;
-                    }
+                    has_pair = 1;
+                    break;
                 }
             }
         }
@@ -61,9 +58,7 @@ int check_string_p2(char *current_string)
         if (i + 2 < len)
         {
             if (current_string[i] == current_string[i + 2])
-            {
                 has_repeat = 1;
-            }
         }
     }
 
