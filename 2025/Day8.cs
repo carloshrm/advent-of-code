@@ -1,6 +1,3 @@
-using System.Numerics;
-using System.Linq;
-
 namespace aoc2025;
 
 internal class Program
@@ -11,68 +8,103 @@ internal class Program
 
         var junctionBoxes = input.Select(ln => new JunctionBox(ln.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse))).ToList();
 
-        var distanceMap = new Dictionary<JunctionBox, CircuitMapping?>();
-        foreach (var targetBox in junctionBoxes)
+        var distanceMap = new List<CircuitMapping>();
+        for (int i = 0; i < junctionBoxes.Count; i++)
         {
-            CircuitMapping? circuitCandidate = null;
-            foreach (var innerBox in junctionBoxes)
-            {
-                if (innerBox == targetBox) continue;
-
-                var distance = targetBox.DistanceTo(innerBox);
-                if (circuitCandidate == null || (distance != 0 && distance <= targetBox.DistanceTo(circuitCandidate.Box)))
-                    circuitCandidate = new CircuitMapping { Distance = distance, Box = innerBox };
-            }
-            distanceMap[targetBox] = circuitCandidate;
+            for (int j = i + 1; j < junctionBoxes.Count; j++)
+                distanceMap.Add(new() { Base = junctionBoxes[i], Target = junctionBoxes[j] });
         }
 
-        var orderedMap = distanceMap.Where(entry => entry.Value != null).OrderBy(entry => entry.Value!.Distance);
-        int limit = 10;
-        for (int i = 0; i < limit; i++)
+        var sortedDistances = distanceMap.OrderBy((entry) => entry.Base.DistanceTo(entry.Target));
+
+        int id = 0;
+        bool stop = false;
+        var circuitMap = new Dictionary<int, HashSet<JunctionBox>>();
+        while (!stop)
         {
-            var (keyBox, targetBox) = orderedMap.ElementAt(i);
-            if (keyBox.Circuit == null)
+            foreach (var pair in sortedDistances)
             {
-                if (targetBox!.Box.Circuit != null)
+                (JunctionBox baseBox, JunctionBox targetBox) = pair;
+
+                if (baseBox.CircuitId == -1)
                 {
-                    keyBox.Circuit = targetBox.Box.Circuit;
-                    keyBox.Circuit.Add(keyBox);
+                    if (targetBox.CircuitId == -1)
+                    {
+                        int newCircuit = id++;
+                        circuitMap.Add(newCircuit, [baseBox, targetBox]);
+                        baseBox.CircuitId = newCircuit;
+                        targetBox.CircuitId = newCircuit;
+                    }
+                    else
+                    {
+                        baseBox.CircuitId = targetBox.CircuitId;
+                        circuitMap[targetBox.CircuitId].Add(baseBox);
+                    }
                 }
                 else
                 {
-                    keyBox.Circuit = [targetBox.Box, keyBox];
-                    targetBox.Box.Circuit = keyBox.Circuit;
+                    if (targetBox.CircuitId == -1)
+                    {
+                        circuitMap[baseBox.CircuitId].Add(targetBox);
+                        targetBox.CircuitId = baseBox.CircuitId;
+                    }
+                    else
+                    {
+                        if (!circuitMap[targetBox.CircuitId].Contains(baseBox))
+                        {
+                            var mergeTargetId = baseBox.CircuitId;
+                            foreach (var box in circuitMap[mergeTargetId])
+                            {
+                                circuitMap[targetBox.CircuitId].Add(box);
+                                box.CircuitId = targetBox.CircuitId;
+                            }
+                            circuitMap.Remove(mergeTargetId);
+                        }
+                    }
                 }
-            } else
-            {
-                if (keyBox.Circuit.Contains(targetBox!.Box))
+
+                if (circuitMap.Any(entry => entry.Value.Count == junctionBoxes.Count))
                 {
-                    // noop
+                    Console.WriteLine(baseBox.Coords.x * targetBox.Coords.x);
+                    stop = true;
+                    break;
                 }
-                else
-                    keyBox.Circuit.Append(targetBox.Box);
             }
         }
 
-        var circuits = orderedMap.Select(mapEntry => mapEntry.Value.Box.Circuit).ToList();
-        Console.WriteLine(0);
-    }    
+        var result = circuitMap
+            .Select(entry => entry.Value.Count)
+            .OrderDescending()
+            .Take(3)
+            .Aggregate(1l, (a, b) => a * b);
+
+        Console.WriteLine(result);
+    }
 }
 
 public class JunctionBox(IEnumerable<int> vals)
 {
-    public (int x, int y, int z) Coords { get; set; } = (vals.ElementAt(0), vals.ElementAt(1), vals.ElementAt(2));
-    public HashSet<JunctionBox>? Circuit { get; set; } = null;
+    public (long x, long y, long z) Coords { get; set; } = (vals.ElementAt(0), vals.ElementAt(1), vals.ElementAt(2));
+    public int CircuitId { get; set; } = -1;
 
-    public double DistanceTo(JunctionBox box)
+    public long DistanceTo(JunctionBox box)
     {
-        return Math.Sqrt(Math.Pow(box.Coords.x - Coords.x, 2) + Math.Pow(box.Coords.y - Coords.y, 2) + Math.Pow(box.Coords.z - Coords.z, 2));
+        long x = Coords.x - box.Coords.x;
+        long y = Coords.y - box.Coords.y;
+        long z = Coords.z - box.Coords.z;
+
+        return (x * x) + (y * y) + (z * z);
     }
 }
 
-public record CircuitMapping
+public class CircuitMapping
 {
-    public double Distance { get; set; } = 0.0;
-    public JunctionBox Box { get; set; }
-}
+    public required JunctionBox Base { get; set; }
+    public required JunctionBox Target { get; set; }
 
+    public void Deconstruct(out JunctionBox baseBox, out JunctionBox targetBox)
+    {
+        baseBox = Base;
+        targetBox = Target;
+    }
+}
