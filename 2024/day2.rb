@@ -1,5 +1,4 @@
 require "./elves"
-require "pry"
 
 input_elf = InputHelper.new
 raw_input = input_elf.get_input(2)
